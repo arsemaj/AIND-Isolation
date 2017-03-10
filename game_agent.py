@@ -1,3 +1,26 @@
+#! /usr/bin/env python
+#**********************************************************************
+#* Name: game_agent (Isolation)                                       *
+#*                                                                    *
+#* Function: Given an unsolved, encoded Sudoku puzzle provided in the *
+#* 'main' function, use constraint propagation and search to find a   *
+#* solution. If no solution is possible, the program exits with no    *
+#* response. If a solution is found, it is displayed in textual format*
+#* on the command-line and, if pygame is installed, will display a    *
+#* graphical animation of the algorithm solving the puzzle on a Sudoku*
+#* board.                                                             *
+#* An example 81-box Sudoku grid encoding would be:                   *
+#*    '2.............62....1....7...6..8...3...9...7...6..4...4....8  *
+#*     ....52.............3'                                          *
+#* where each dot represents an unsolved box in the grid.             *
+#*                                                                    *
+#* Usage: python solution.py                                          *
+#*                                                                    *
+#* Written:  03/16/2017  James Damgar (Based on Udacity AIND content) *
+#* Modified:                                                          *
+#*                                                                    *
+#**********************************************************************
+
 """This file contains all the classes you must complete for this project.
 
 You can use the test cases in agent_test.py to help during development, and
@@ -37,7 +60,7 @@ def custom_score(game, player):
         The heuristic value of the current game state to the specified player.
     """
 
-    # TODO: finish this function!
+    # First, let's 
     raise NotImplementedError
 
 
@@ -116,28 +139,39 @@ class CustomPlayer:
             (-1, -1) if there are no available legal moves.
         """
 
+        # Keep a record of how much time we have left to go
         self.time_left = time_left
-
-        # TODO: finish this function!
 
         # Perform any required initializations, including selecting an initial
         # move from the game board (i.e., an opening book), or returning
         # immediately if there are no legal moves
-
+        
+        # Return if there are no legal moves to attempt
+        if len(legal_moves) == 0:
+            return (-1, -1)
+        
+        # Otherwise, select our first insurance move before time runs out
+        move = legal_moves[0]
+        
         try:
             # The search method call (alpha beta or minimax) should happen in
             # here in order to avoid timeout. The try/except block will
             # automatically catch the exception raised by the search method
             # when the timer gets close to expiring
-            pass
+            if self.method == 'minimax':
+                score, move = self.minimax(game, self.search_depth, True)
+            elif self.method == 'alphabeta'
+                #score, move = self.alphabeta()
 
         except Timeout:
-            # Handle any actions required at timeout, if necessary
-            pass
+            # Return the best move we've found so far or an insurance move
+            return move
 
         # Return the best move from the last completed search iteration
-        raise NotImplementedError
+        return move
 
+        
+        
     def minimax(self, game, depth, maximizing_player=True):
         """Implement the minimax search algorithm as described in the lectures.
 
@@ -169,11 +203,43 @@ class CustomPlayer:
                 to pass the project unit tests; you cannot call any other
                 evaluation function directly.
         """
+        # Raise an exception if we've run out of time without an answer
         if self.time_left() < self.TIMER_THRESHOLD:
             raise Timeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        # Evaluate the score of the current board for potential use
+        # Keep track of our best move choice.
+        if maximizing_player:
+            best_score = float("-inf")
+        else:
+            best_score = float("inf")
+        best_move      = (-1, -1)
+        current_score  = best_score
+        current_move   = best_move
+            
+        # If we're at our maximum depth, just return our score value
+        if depth == 0:
+            return self.score(game, game.active_player()), (-1, -1)
+            
+        # Get the set of legal moves for the current player
+        legal_moves = game.get_legal_moves()
+        
+        # Iterate over every legal move in depth-search fashion
+        for current_move in legal_moves:
+            # Copy the game state as if the move occurred and make a recursive call
+            game_copy                = game.forecast_move(current_move)
+            current_score, junk_move = self.minimax(game_copy, depth-1, not maximizing_player)
+            # Update our best choice, if necessary
+            if maximizing_player and current_score > best_score:
+                best_score = current_score
+                best_move  = current_move
+            elif not maximizing_player and current_score < best_score:
+                best_score = current_score
+                best_move  = current_move
+            
+        # Return our best option
+        return best_score, best_move
+        
 
     def alphabeta(self, game, depth, alpha=float("-inf"), beta=float("inf"), maximizing_player=True):
         """Implement minimax search with alpha-beta pruning as described in the
