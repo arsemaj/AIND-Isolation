@@ -408,7 +408,9 @@ class Project1Test(unittest.TestCase):
 
             # disable search timeout by returning a constant value
             agentUT.time_left = lambda: 1e3
-            _, move = agentUT.minimax(board, test_depth)
+            #_, move = agentUT.minimax(board, test_depth)
+            value, move = agentUT.minimax(board, test_depth)
+            print("MOVE: "+str(move)+", VALUE: "+str(value))
 
             num_explored_valid = board.counts[0] == counts[idx][0]
             num_unique_valid = board.counts[1] == counts[idx][1]
@@ -463,7 +465,7 @@ class Project1Test(unittest.TestCase):
             # disable search timeout by returning a constant value
             agentUT.time_left = lambda: 1e3
             _, move = agentUT.alphabeta(board, test_depth)
-
+            
             num_explored_valid = board.counts[0] == counts[idx][0]
             num_unique_valid = board.counts[1] == counts[idx][1]
 
@@ -529,7 +531,8 @@ class Project1Test(unittest.TestCase):
 
             diff_total = abs(board.counts[0] - exact_counts[idx][0])
             diff_unique = abs(board.counts[1] - exact_counts[idx][1])
-
+            print("Board Counts 0: "+str(board.counts[0]))
+            print("Board Counts 1: "+str(board.counts[1]))
             self.assertTrue(diff_total <= 1 and diff_unique == 0, ID_FAIL)
 
             self.assertTrue(chosen_move in legal_moves, INVALID_MOVE.format(
