@@ -1,5 +1,5 @@
 """This file contains a collection of player classes for comparison with your
-own agent and example heuristic functions.
+own agent and example heuristic functions..
 """
 
 from random import randint
